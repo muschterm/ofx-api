@@ -11,12 +11,12 @@ public class GreetingResource {
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
 	public String hello() {
-		var array = new int[]{
+		var array = new Integer[]{
 			1,
 			2,
 			3
 		};
-		return "Hello from RESTEasy Reactive";
+		return "Hello from RESTEasy Reactive %s".formatted((Object) array);
 	}
 
 }
