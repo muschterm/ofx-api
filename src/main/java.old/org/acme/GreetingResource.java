@@ -5,6 +5,8 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 
+import java.util.Arrays;
+
 @Path("/hello")
 public class GreetingResource {
 
@@ -14,9 +16,11 @@ public class GreetingResource {
 		var array = new Integer[]{
 			1,
 			2,
-			3
+			3,
+			4,
+			5
 		};
-		return "Hello from RESTEasy Reactive %s".formatted((Object) array);
+		return "Hello from RESTEasy Reactive %s".formatted(Arrays.toString(array));
 	}
 
 }

@@ -1,0 +1,127 @@
+quarkus:
+  package:
+    type: "uber-jar"
+  jackson:
+    fail-on-empty-beans: false
+    fail-on-unknown-properties: false
+    serialization-inclusion: non_null
+    write-dates-as-timestamps: false
+  datasource:
+    devservices:
+      enabled: false
+
+"%db-h2":
+  quarkus:
+    datasource:
+      db-kind: h2
+      username: sa
+      password:
+      jdbc:
+        url: jdbc:h2:mem:ofx-api
+    hibernate-orm:
+      database:
+        generation: drop-and-create
+
+"%db-postgresql":
+  quarkus:
+    datasource:
+      db-kind: postgresql
+      username: ofx
+      password: ofx
+      jdbc:
+        # https://jdbc.postgresql.org/documentation/use
+        # assumes running locally in a docker container (see docker/stack.yml)
+        url: jdbc:postgresql://localhost:5432/ofx-api
+
+"%db-h2-generate-schema":
+  quarkus:
+    config:
+      profile:
+        parent: db-h2
+    hibernate-orm:
+      database:
+        generation: none
+      scripts:
+        generation:
+          ~: drop-and-create
+          create-target: target/db/h2/create.sql
+          drop-target: target/db/h2/drop.sql
+
+"%db-postgresql-generate-schema":
+  quarkus:
+    config:
+      profile:
+        parent: db-postgresql
+    hibernate-orm:
+      database:
+        generation: none
+      scripts:
+        generation:
+          ~: drop-and-create
+          create-target: target/db/postgresql/create.sql
+          drop-target: target/db/postgresql/drop.sql
+
+"%dev":
+  quarkus:
+    config:
+      profile:
+        parent: db-h2
+    datasource:
+      jdbc:
+        url: jdbc:h2:~/h2/ofx-api-dev;AUTO_SERVER=true
+
+"%test":
+  quarkus:
+    config:
+      profile:
+        parent: db-h2
+    datasource:
+      jdbc:
+        url: jdbc:h2:~/h2/ofx-api-test
+    liquibase:
+      change-log: db/h2/change-log.yml
+      migrate-at-start: true
+      clean-at-start: true
+
+"%prod":
+  quarkus:
+    config:
+      profile:
+        parent: db-h2
+    datasource:
+      jdbc:
+        url: jdbc:h2:~/h2/ofx-api-prod
+    hibernate-orm:
+      database:
+        generation: validate
+    liquibase:
+      change-log: db/h2/change-log.yml
+      migrate-at-start: true
+      clean-at-start: true
+
+"%prod-postgresql":
+  quarkus:
+    config:
+      profile:
+        parent: db-postgresql
+    hibernate-orm:
+      database:
+        generation: validate
+    liquibase:
+      change-log: db/postgresql/change-log.yml
+      migrate-at-start: true
+      clean-at-start: true
+
+"%prod-aws":
+  quarkus:
+    config:
+      profile:
+        parent: prod-postgresql
+    datasource:
+      jdbc:
+        url: jdbc:postgresql://{aws-url}:{aws-port}/
+    hibernate-orm:
+      database:
+        generation: validate
+    liquibase:
+      clean-at-start: false
